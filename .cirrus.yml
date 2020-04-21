@@ -3,7 +3,7 @@ btest_jobs: &BTEST_JOBS 8
 btest_retries: &BTEST_RETRIES 2
 memory: &MEMORY 6GB
 
-config: &CONFIG --build-type=release --enable-cpp-tests
+config: &CONFIG --build-type=release --enable-cpp-tests --prefix=$CIRRUS_WORKING_DIR/install
 memcheck_config: &MEMCHECK_CONFIG --build-type=debug --enable-cpp-tests --sanitizers=address
 
 resources_template: &RESOURCES_TEMPLATE
@@ -14,7 +14,8 @@ ci_template: &CI_TEMPLATE
   only_if: >
     $CIRRUS_PR != '' ||
     $CIRRUS_BRANCH == 'master' ||
-    $CIRRUS_BRANCH =~ 'release/.*'
+    $CIRRUS_BRANCH =~ 'release/.*' ||
+    $CIRRUS_BRANCH == 'topic/timw/ci-benchmark'
 
   # Default timeout is 60 minutes, Cirrus hard limit is 120 minutes for free
   # tasks, so may as well ask for full time.
@@ -69,6 +70,14 @@ centos7_task:
     dockerfile: ci/centos-7/Dockerfile
     << : *RESOURCES_TEMPLATE
   << : *CI_TEMPLATE
+  on_success:
+    binaries_artifacts:
+      path: $CIRRUS_WORKING_DIR/install
+
+benchmark_test:
+  depends_on:
+    - centos7
+  script: ./ci/benchmark.sh
 
 debian9_task:
   container:
