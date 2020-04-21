@@ -72,7 +72,7 @@ centos7_task:
   << : *CI_TEMPLATE
   on_success:
     binaries_artifacts:
-      path: $CIRRUS_WORKING_DIR/install
+      path: $CIRRUS_WORKING_DIR/build.tgz
 
 benchmark_test:
   depends_on:
