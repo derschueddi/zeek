@@ -72,9 +72,13 @@ centos7_task:
   << : *CI_TEMPLATE
   on_success:
     binaries_artifacts:
-      path: $CIRRUS_WORKING_DIR/build.tgz
+      path: build.tgz
 
-benchmark_test:
+benchmark_task:
+  container:
+    # CentOS 7 EOL: June 30, 2024
+    dockerfile: ci/centos-7/Dockerfile
+    << : *RESOURCES_TEMPLATE
   depends_on:
     - centos7
   script: ./ci/benchmark.sh
