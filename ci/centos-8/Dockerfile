@@ -22,6 +22,8 @@ RUN dnf -y update && dnf -y install \
     python3-pip \
     zlib-devel \
     libsqlite3x-devel \
+    findutils \
+    which \
   && dnf clean all && rm -rf /var/cache/dnf
 
 # Many distros adhere to PEP 394's recommendation for `python` = `python2` so
