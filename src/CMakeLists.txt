@@ -153,6 +153,7 @@ add_subdirectory(iosource)
 add_subdirectory(logging)
 add_subdirectory(probabilistic)
 
+
 ########################################################################
 ## bro target
 
@@ -204,7 +205,7 @@ set_source_files_properties(nb_dns.c PROPERTIES COMPILE_FLAGS
                             -fno-strict-aliasing)
 
 set(MAIN_SRCS
-    main.cc
+    zeek-setup.cc
     digest.cc
     net_util.cc
     util.cc
@@ -241,6 +242,7 @@ set(MAIN_SRCS
     Frag.cc
     Frame.cc
     Func.cc
+    FuzzBuffer.cc
     Hash.cc
     ID.cc
     IntSet.cc
@@ -316,7 +318,7 @@ set(THIRD_PARTY_SRCS
     3rdparty/sqlite3.c
 )
 
-set(bro_SRCS
+set(zeek_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/version.c
     ${BIF_SRCS}
     ${BINPAC_AUXSRC}
@@ -336,9 +338,16 @@ set(bro_SRCS
     ${MAIN_SRCS}
 )
 
-collect_headers(bro_HEADERS ${bro_SRCS})
+collect_headers(zeek_HEADERS ${zeek_SRCS})
 
-add_executable(zeek ${bro_SRCS} ${bro_HEADERS} ${bro_SUBDIR_LIBS} ${bro_PLUGIN_LIBS})
+add_library(zeek_objs OBJECT ${zeek_SRCS})
+
+add_executable(zeek main.cc
+               $<TARGET_OBJECTS:zeek_objs>
+               ${zeek_HEADERS}
+               ${bro_SUBDIR_LIBS}
+               ${bro_PLUGIN_LIBS}
+)
 target_link_libraries(zeek ${zeekdeps} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
 
 if ( NOT "${bro_LINKER_FLAGS}" STREQUAL "" )
@@ -459,3 +468,28 @@ if (ENABLE_ZEEK_UNIT_TESTS)
                  COMMAND zeek --test "--test-case=${test_case}")
     endforeach ()
 endif ()
+
+########################################################################
+## Fuzzing targets
+
+macro(ADD_FUZZ_TARGET target_name analyzer_name)
+    if ( ZEEK_ENABLE_FUZZING )
+        foreach ( _src_file ${ARGN} )
+            set_property(SOURCE ${_src_file} PROPERTY COMPILE_DEFINITIONS
+                         ZEEK_FUZZ_ANALYZER="${analyzer_name}")
+        endforeach ()
+
+        add_executable(${target_name} ${ARGN}
+                       $<TARGET_OBJECTS:zeek_objs>
+                       ${zeek_HEADERS}
+                       ${bro_SUBDIR_LIBS}
+                       ${bro_PLUGIN_LIBS})
+        target_link_libraries(${target_name} ${zeekdeps}
+                              ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
+        # TODO: Use LIB_FUZZING_ENGINE env. var. if it exists
+        set_target_properties(${target_name} PROPERTIES LINK_FLAGS
+                              "-fsanitize=fuzzer")
+    endif ()
+endmacro ()
+
+add_fuzz_target(zeek_fuzz_pop3 pop3 analyzer/protocol/pop3/fuzzer.cc)
