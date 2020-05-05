@@ -31,6 +31,8 @@ public:
 	static analyzer::Analyzer* Instantiate(Connection* conn)
 		{ return new SSL_Analyzer(conn); }
 
+  binpac::TLSHandshake::Handshake_Conn* handshake() { return handshake_interp; }
+
 protected:
 	binpac::SSL::SSL_Conn* interp;
 	binpac::TLSHandshake::Handshake_Conn* handshake_interp;
