@@ -25,6 +25,9 @@ public:
 	// Tell the analyzer that encryption has started.
 	void StartEncryption();
 
+	StringVal * master_key() { return master_key_; }
+	void SetMasterKey(const u_char* ms, int len);
+
 	// Overriden from tcp::TCP_ApplicationAnalyzer.
 	void EndpointEOF(bool is_orig) override;
 
@@ -37,6 +40,7 @@ protected:
 	binpac::SSL::SSL_Conn* interp;
 	binpac::TLSHandshake::Handshake_Conn* handshake_interp;
 	bool had_gap;
+	StringVal * master_key_;
 
 };
 

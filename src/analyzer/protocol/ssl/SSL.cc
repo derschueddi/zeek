@@ -48,6 +48,12 @@ void SSL_Analyzer::StartEncryption()
 	interp->setEstablished();
 	}
 
+void SSL_Analyzer::SetMasterKey(const u_char* ms, int len)
+	{
+	 master_key_ = new StringVal(len, (const char *) ms);
+	}
+
+
 void SSL_Analyzer::DeliverStream(int len, const u_char* data, bool orig)
 	{
 	tcp::TCP_ApplicationAnalyzer::DeliverStream(len, data, orig);
