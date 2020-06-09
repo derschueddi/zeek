@@ -16,12 +16,14 @@ SSL_Analyzer::SSL_Analyzer(Connection* c)
 	interp = new binpac::SSL::SSL_Conn(this);
 	handshake_interp = new binpac::TLSHandshake::Handshake_Conn(this);
 	had_gap = false;
+	master_key_ = new StringVal(0, "");
 	}
 
 SSL_Analyzer::~SSL_Analyzer()
 	{
 	delete interp;
 	delete handshake_interp;
+	delete master_key_;
 	}
 
 void SSL_Analyzer::Done()
