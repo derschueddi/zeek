@@ -3,6 +3,7 @@
 #include "events.bif.h"
 
 #include "analyzer/protocol/tcp/TCP.h"
+#include "analyzer/protocol/http/HTTP.h"
 
 namespace binpac { namespace SSL { class SSL_Conn; } }
 
@@ -36,11 +37,14 @@ public:
 
   binpac::TLSHandshake::Handshake_Conn* handshake() { return handshake_interp; }
 
+  void ForwardHTTPData(int len, const u_char* data, bool orig);
+
 protected:
 	binpac::SSL::SSL_Conn* interp;
 	binpac::TLSHandshake::Handshake_Conn* handshake_interp;
 	bool had_gap;
 	StringVal * master_key_;
+	analyzer::http::HTTP_Analyzer* http = nullptr;
 
 };
 

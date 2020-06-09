@@ -1,5 +1,6 @@
 
 #include "SSL.h"
+#include "analyzer/Manager.h"
 #include "analyzer/protocol/tcp/TCP_Reassembler.h"
 #include "Reporter.h"
 #include "util.h"
@@ -98,3 +99,27 @@ void SSL_Analyzer::Undelivered(uint64_t seq, int len, bool orig)
 	had_gap = true;
 	interp->NewGap(orig, len);
 	}
+
+void SSL_Analyzer::ForwardHTTPData(int len, const u_char* data, bool orig)
+  {
+  if ( ! http )
+    {
+    http = reinterpret_cast<analyzer::http::HTTP_Analyzer*>(analyzer_mgr->InstantiateAnalyzer("HTTP", Conn()));
+    if ( ! http )
+      {
+      reporter->InternalError("Could not instantiate HTTP Analyzer");
+      return;
+      }
+    AddChildAnalyzer(http);
+    }
+  // Cannot use ForwardStream, due to protocol mismatch.
+  // We cheat and use NewData directly.
+  try
+    {
+    http->DeliverStream(len, data, orig);
+    }
+  catch ( const binpac::Exception& e )
+    {
+    ProtocolViolation(fmt("Binpac exception when forwarding to HTTP analyzer: %s", e.c_msg()));
+    }
+}
