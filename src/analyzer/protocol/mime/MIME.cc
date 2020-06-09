@@ -1061,7 +1061,7 @@ void MIME_Entity::DecodeQuotedPrintable(int len, const char* data)
 	// Ignore trailing HT and SP.
 	int i;
 	for ( i = len - 1; i >= 0; --i )
-		if ( data[i] != HT && data[i] != SP )
+		if ( data[i] != HT && data[i] != MIME_SP )
 			break;
 
 	int end_of_line = i;
@@ -1105,7 +1105,7 @@ void MIME_Entity::DecodeQuotedPrintable(int len, const char* data)
 			  (data[i] >= 62 && data[i] <= 126) )
 			DataOctet(data[i]);
 
-		else if ( data[i] == HT || data[i] == SP )
+		else if ( data[i] == HT || data[i] == MIME_SP )
 			DataOctet(data[i]);
 
 		else

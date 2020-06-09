@@ -22,7 +22,7 @@ namespace analyzer { namespace mime {
 // MIME Constants
 
 #define HT	'\011'
-#define SP	'\040'
+#define MIME_SP	'\040'
 #define CR	'\015'
 #define LF	'\012'
 
