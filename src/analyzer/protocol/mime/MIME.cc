@@ -1029,7 +1029,7 @@ void MIME_Entity::DecodeBinary(int len, const char* data, bool trailing_CRLF)
 	if ( delay_adding_implicit_CRLF )
 		{
 		delay_adding_implicit_CRLF = false;
-		DataOctet(CR);
+		DataOctet(MIME_CR);
 		DataOctet(LF);
 		}
 
@@ -1050,7 +1050,7 @@ void MIME_Entity::DecodeBinary(int len, const char* data, bool trailing_CRLF)
 			}
 		else
 			{
-			DataOctet(CR);
+			DataOctet(MIME_CR);
 			DataOctet(LF);
 			}
 		}
@@ -1117,7 +1117,7 @@ void MIME_Entity::DecodeQuotedPrintable(int len, const char* data)
 
 	if ( ! soft_line_break )
 		{
-		DataOctet(CR);
+		DataOctet(MIME_CR);
 		DataOctet(LF);
 		}
 	}

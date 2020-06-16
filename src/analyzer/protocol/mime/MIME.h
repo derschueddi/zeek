@@ -23,7 +23,7 @@ namespace analyzer { namespace mime {
 
 #define HT	'\011'
 #define MIME_SP	'\040'
-#define CR	'\015'
+#define MIME_CR	'\015'
 #define LF	'\012'
 
 enum MIME_CONTENT_TYPE {
